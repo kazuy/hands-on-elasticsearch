@@ -1,0 +1,19 @@
+version: '3'
+services:
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/Dockerfile
+    container_name: hands-on-elasticsearch
+    environment:
+      - TZ=Asia/Tokyo
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    container_name: hands-on-kibana
+    environment:
+      - TZ=Asia/Tokyo
+    ports:
+      - 5601:5601
