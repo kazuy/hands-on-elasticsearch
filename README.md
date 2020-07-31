@@ -68,14 +68,18 @@ curl -H "Content-Type: application/json" \
 
 ### 取得
 
+登録時のレスポンスに含まれる"_id"を指定する。
+
 ```sh
-curl -XGET "http://localhost:9200/customer/_doc/1?pretty"
+curl -XGET "http://localhost:9200/customer/_doc/<_idの値>?pretty"
 ```
 
 ### 削除
 
+登録時のレスポンスに含まれる"_id"を指定する。
+
 ```sh
-curl -XDELETE "http://localhost:9200/customer/_doc/1?pretty"
+curl -XDELETE "http://localhost:9200/customer/_doc/<_idの値>?pretty"
 ```
 
 ### 大量登録
@@ -153,6 +157,7 @@ curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_sear
 ```sh
 curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
 {
+  "size": 0,
   "aggs": {
     "group_by_state": {
       "terms": {
