@@ -87,3 +87,104 @@ curl -H "Content-Type: application/json" \
      -XPOST "http://localhost:9200/bank/_bulk?pretty&refresh" \
      --data-binary "@accounts.json"
 ```
+
+## 検索
+
+Queryを駆使することで柔軟な検索が可能になる。
+
+### 特定のフィールド検索
+
+スペースで区切ることでOR検索が可能。
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "query": { "match": { "address": "mill lane" } }
+}'
+```
+
+### 複雑な検索
+
+Boolean queryを使用すると複雑な検索も可能。
+
+それぞれがTrueになるドキュメントを取得する。
+
+詳細は[こちら](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "age": "40" } }
+      ],
+      "must_not": [
+        { "match": { "state": "ID" } }
+      ]
+    }
+  }
+}'
+```
+
+範囲指定は以下のようにする。
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "query": {
+    "bool": {
+      "must": { "match_all": {} },
+      "filter": {
+        "range": {
+          "balance": {
+            "gte": 20000,
+            "lte": 30000
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+### グルーピング
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "state.keyword"
+      }
+    }
+  }
+}'
+```
+
+### ソート
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "query": { "match_all": {} },
+  "sort": [
+    { "account_number": "asc" }
+  ]
+}'
+```
+
+RDBのようなOFFSET、LIMITも可能。
+
+```sh
+curl -H "Content-Type: application/json" -XGET "http://localhost:9200/bank/_search?pretty" -d '
+{
+  "query": { "match_all": {} },
+  "sort": [
+    { "account_number": "asc" }
+  ],
+  "from": 10,
+  "size": 10
+}'
+```
